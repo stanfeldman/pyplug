@@ -11,7 +11,7 @@ class MetaPlugin(type):
 		if "implements" in attrs:
 			new_obj = new_class()
 			for iface in attrs["implements"]:
-				iface.implementors.append(new_obj)
+				iface.plugins[new_obj.name] = new_obj
 		return new_class
 	
 	
@@ -22,18 +22,36 @@ class Plugin(object):
 class MetaInterface(type):
 	def __new__(metaclass, classname, bases, attrs):
 		new_class = super(MetaInterface, metaclass).__new__(metaclass, classname, bases, attrs)
-		new_class.implementors = []
-		for k, v in new_class.__dict__.iteritems():
+		new_class.plugins = {}
+		for k, v in attrs.iteritems():
 			if type(v) is FunctionType:
-				setattr(new_class, k, classmethod(MetaInterface.meta_method(k)))
+				setattr(new_class, k+"_get_all", classmethod(MetaInterface.meta_method_get_all(k)))
+				setattr(new_class, k+"_call_all", classmethod(MetaInterface.meta_method_call_all(k)))
+				setattr(new_class, k, classmethod(MetaInterface.meta_method_call_first(k)))
 		return new_class
 	
 	@staticmethod
-	def meta_method(method_name):
+	def meta_method_get_all(method_name):
 		def wrapper(cls, *args, **kwargs):
-			for impl in cls.implementors:
+			for impl in cls.plugins.values():
+				method = getattr(impl, method_name)
+				yield method(*args, **kwargs)
+		return wrapper
+		
+	@staticmethod
+	def meta_method_call_all(method_name):
+		def wrapper(cls, *args, **kwargs):
+			for impl in cls.plugins.values():
 				method = getattr(impl, method_name)
 				method(*args, **kwargs)
+		return wrapper
+		
+	@staticmethod
+	def meta_method_call_first(method_name):
+		def wrapper(cls, *args, **kwargs):
+			for impl in cls.plugins.values():
+				method = getattr(impl, method_name)
+				return method(*args, **kwargs)
 		return wrapper
 		
 		
