@@ -3,7 +3,6 @@ from putils.filesystem import Dir
 from types import FunctionType
 import os
 import mimetypes
-from pev import Eventer
 
 
 class MetaPlugin(type):
@@ -13,14 +12,14 @@ class MetaPlugin(type):
 		if "implements" in attrs:
 			for iface in attrs["implements"]:
 				iface.plugins[new_obj.name] = new_obj
-		if "events" in attrs:
-			eventer = Eventer()
-			for e,f in attrs["events"].iteritems():
-				eventer.subscribe(e, getattr(new_obj, f))
 		return new_class
 	
 	
 class Plugin(object):
+	"""
+	Plugin must inherit from this class.
+	This class register itself as implementation of some interfaces.
+	"""
 	__metaclass__ = MetaPlugin
 
 
@@ -61,6 +60,10 @@ class MetaInterface(type):
 		
 		
 class Interface(object):
+	"""
+	Derive from this class to create plugin interface.
+	Then you can call all plugins or get some by name.
+	"""
 	__metaclass__ = MetaInterface
 	
 	

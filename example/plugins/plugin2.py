@@ -7,7 +7,6 @@ class Plugin2(Plugin):
 	author = "Stanislav Feldman"
 	description = "super plugin2"
 	implements = [MyInterface]
-	dependencies = ["putils"]
 	
 	def do_smth(self):
 		print "hi from plugin2"
