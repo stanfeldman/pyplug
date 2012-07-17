@@ -3,15 +3,20 @@ from putils.filesystem import Dir
 from types import FunctionType
 import os
 import mimetypes
+from pev import Eventer
 
 
 class MetaPlugin(type):
 	def __new__(metaclass, classname, bases, attrs):
 		new_class = super(MetaPlugin, metaclass).__new__(metaclass, classname, bases, attrs)
+		new_obj = new_class()
 		if "implements" in attrs:
-			new_obj = new_class()
 			for iface in attrs["implements"]:
 				iface.plugins[new_obj.name] = new_obj
+		if "events" in attrs:
+			eventer = Eventer()
+			for e,f in attrs["events"].iteritems():
+				eventer.subscribe(e, getattr(new_obj, f))
 		return new_class
 	
 	
@@ -63,6 +68,6 @@ class PluginLoader(object):
 	@staticmethod
 	def load(project_dir, plugin_dir):
 		def cb(p):
-			if mimetypes.guess_type(p)[0] == "text/x-python" and os.path.basename(p) != "__init__.py":
+			if mimetypes.guess_type(p)[0] == "text/x-python":
 				Importer.import_module_by_path(p, project_dir)
 		Dir.walk(plugin_dir, cb)

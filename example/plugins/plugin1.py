@@ -7,10 +7,16 @@ class Plugin1(Plugin):
 	author = "Stanislav Feldman"
 	description = "super plugin"
 	implements = [MyInterface]
-	dependencies = ["putils"]
+	events = {
+		"app.started": "on_event1"
+	}
+	#dependencies = ["putils"]
 	
 	def do_smth(self):
 		print "hello from plugin1"
 		
 	def get_smth(self):
 		return "result from plugin1"
+		
+	def on_event1(self, msg):
+		print "on event1:", msg

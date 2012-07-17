@@ -1,9 +1,11 @@
 from sys import path
 path.append("/home/stanislavfeldman/projects/python/putils/")
 path.append("/home/stanislavfeldman/projects/python/pyplug/")
+path.append("/home/stanislavfeldman/projects/python/pev/")
 import os
 from pyplug import PluginLoader
 from interface import MyInterface
+from pev import Eventer
 		
 		
 if __name__ == "__main__":
@@ -15,3 +17,4 @@ if __name__ == "__main__":
 	MyInterface.do_smth_call_all()
 	print MyInterface.get_smth()
 	print MyInterface.plugins["plugin2"].get_smth()
+	Eventer().publish("app.started", "lala")
