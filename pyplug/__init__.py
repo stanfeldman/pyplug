@@ -38,24 +38,27 @@ class MetaInterface(type):
 	def meta_method_get_all(method_name):
 		def wrapper(cls, *args, **kwargs):
 			for impl in cls.plugins.values():
-				method = getattr(impl, method_name)
-				yield method(*args, **kwargs)
+				if hasattr(impl, method_name):
+					method = getattr(impl, method_name)
+					yield method(*args, **kwargs)
 		return wrapper
 		
 	@staticmethod
 	def meta_method_call_all(method_name):
 		def wrapper(cls, *args, **kwargs):
 			for impl in cls.plugins.values():
-				method = getattr(impl, method_name)
-				method(*args, **kwargs)
+				if hasattr(impl, method_name):
+					method = getattr(impl, method_name)
+					method(*args, **kwargs)
 		return wrapper
 		
 	@staticmethod
 	def meta_method_call_first(method_name):
 		def wrapper(cls, *args, **kwargs):
 			for impl in cls.plugins.values():
-				method = getattr(impl, method_name)
-				return method(*args, **kwargs)
+				if hasattr(impl, method_name):
+					method = getattr(impl, method_name)
+					return method(*args, **kwargs)
 		return wrapper
 		
 		
@@ -69,8 +72,12 @@ class Interface(object):
 	
 class PluginLoader(object):
 	@staticmethod
-	def load(project_dir, plugin_dir):
+	def load(plugin_path):
+		try:
+			plugin_path = Importer.module_path(plugin_path) # maybe plugin_path is module name
+		except:
+			pass
 		def cb(p):
-			if mimetypes.guess_type(p)[0] == "text/x-python":
-				Importer.import_module_by_path(p, project_dir)
-		Dir.walk(plugin_dir, cb)
+			if mimetypes.guess_type(p)[0] in ["text/x-python", "application/x-python-code"]:
+				Importer.import_module_by_path(p)
+		Dir.walk(plugin_path, cb)
