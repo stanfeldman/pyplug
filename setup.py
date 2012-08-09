@@ -6,7 +6,7 @@ except:
 
 setup(
     name = "pyplug",
-    version = "0.1.4",
+    version = "0.1.5",
     author = "Stanislav Feldman",
     description = ("Python plugin framework"),
     url = "https://github.com/stanislavfeldman/pyplug",

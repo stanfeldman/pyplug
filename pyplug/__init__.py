@@ -1,7 +1,7 @@
 from putils.dynamics import Importer
 from putils.filesystem import Dir
 from types import FunctionType
-import os
+import os, sys
 import mimetypes
 
 
@@ -78,6 +78,6 @@ class PluginLoader(object):
 		except:
 			pass
 		def cb(p):
-			if mimetypes.guess_type(p)[0] in ["text/x-python", "application/x-python-code"]:
+			if mimetypes.guess_type(p)[0] == "text/x-python":
 				Importer.import_module_by_path(p)
 		Dir.walk(plugin_path, cb)
