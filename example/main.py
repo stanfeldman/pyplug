@@ -16,4 +16,8 @@ if __name__ == "__main__":
 		print result
 	MyInterface.do_smth_call_all()
 	print MyInterface.get_smth()
+	print MyInterface.prop()
+	for res in MyInterface.attr_get_all():
+		print res
+	#print MyInterface.attr()
 	print MyInterface.plugins["plugin2"].get_smth()

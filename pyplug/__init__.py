@@ -32,6 +32,9 @@ class MetaInterface(type):
 				setattr(new_class, k+"_get_all", classmethod(MetaInterface.meta_method_get_all(k)))
 				setattr(new_class, k+"_call_all", classmethod(MetaInterface.meta_method_call_all(k)))
 				setattr(new_class, k, classmethod(MetaInterface.meta_method_call_first(k)))
+			else:
+				setattr(new_class, k+"_get_all", classmethod(MetaInterface.meta_property_all(k)))
+				setattr(new_class, k, classmethod(MetaInterface.meta_property_first(k)))
 		return new_class
 	
 	@staticmethod
@@ -59,6 +62,22 @@ class MetaInterface(type):
 				if hasattr(impl, method_name):
 					method = getattr(impl, method_name)
 					return method(*args, **kwargs)
+		return wrapper
+		
+	@staticmethod
+	def meta_property_all(method_name):
+		def wrapper(cls):
+			for impl in cls.plugins.values():
+				if hasattr(impl, method_name):
+					yield getattr(impl, method_name)
+		return wrapper
+		
+	@staticmethod
+	def meta_property_first(method_name):
+		def wrapper(cls):
+			for impl in cls.plugins.values():
+				if hasattr(impl, method_name):
+					return getattr(impl, method_name)
 		return wrapper
 		
 		

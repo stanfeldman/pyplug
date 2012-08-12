@@ -8,8 +8,14 @@ class Plugin2(Plugin):
 	description = "super plugin2"
 	implements = [MyInterface]
 	
+	attr = "hey from pl2"
+	
 	def do_smth(self):
 		print "hi from plugin2"
 		
 	def get_smth(self):
 		return "result from plugin2"
+		
+	@property
+	def prop(self):
+		return 555
