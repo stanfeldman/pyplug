@@ -20,4 +20,4 @@ if __name__ == "__main__":
 	for res in MyInterface.attr_get_all():
 		print res
 	#print MyInterface.attr()
-	print MyInterface.plugins["plugin2"].get_smth()
+	print MyInterface.plugins["Plugin2"].get_smth()

@@ -11,7 +11,7 @@ class MetaPlugin(type):
 		new_obj = new_class()
 		if "implements" in attrs:
 			for iface in attrs["implements"]:
-				iface.plugins[new_obj.name] = new_obj
+				iface.plugins[new_obj.__class__.__name__] = new_obj
 		return new_class
 	
 	
