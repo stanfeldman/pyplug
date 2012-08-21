@@ -5,6 +5,7 @@ import os
 from pyplug import PluginLoader, Interface
 from interface import MyInterface, MyBaseInterface
 from putils.dynamics import Importer, Introspector
+import inspect
 		
 		
 if __name__ == "__main__":
@@ -23,4 +24,3 @@ if __name__ == "__main__":
 		print res
 	#print MyInterface.attr()
 	print MyInterface.plugins["Plugin2"].get_smth()
-	print MyBaseInterface.__subclasses__()
