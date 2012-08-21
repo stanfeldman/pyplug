@@ -40,7 +40,10 @@ class MetaInterface(type):
 	@staticmethod
 	def meta_method_get_all(method_name):
 		def wrapper(cls, *args, **kwargs):
-			for impl in cls.plugins.values():
+			impls = list(cls.plugins.values())
+			for subclass in cls.__subclasses__():
+				impls = impls + list(subclass.plugins.values())
+			for impl in impls:
 				if hasattr(impl, method_name):
 					method = getattr(impl, method_name)
 					yield method(*args, **kwargs)
@@ -49,7 +52,10 @@ class MetaInterface(type):
 	@staticmethod
 	def meta_method_call_all(method_name):
 		def wrapper(cls, *args, **kwargs):
-			for impl in cls.plugins.values():
+			impls = list(cls.plugins.values())
+			for subclass in cls.__subclasses__():
+				impls = impls + list(subclass.plugins.values())
+			for impl in impls:
 				if hasattr(impl, method_name):
 					method = getattr(impl, method_name)
 					method(*args, **kwargs)
@@ -58,7 +64,10 @@ class MetaInterface(type):
 	@staticmethod
 	def meta_method_call_first(method_name):
 		def wrapper(cls, *args, **kwargs):
-			for impl in cls.plugins.values():
+			impls = list(cls.plugins.values())
+			for subclass in cls.__subclasses__():
+				impls = impls + list(subclass.plugins.values())
+			for impl in impls:
 				if hasattr(impl, method_name):
 					method = getattr(impl, method_name)
 					return method(*args, **kwargs)
@@ -67,7 +76,10 @@ class MetaInterface(type):
 	@staticmethod
 	def meta_property_all(method_name):
 		def wrapper(cls):
-			for impl in cls.plugins.values():
+			impls = list(cls.plugins.values())
+			for subclass in cls.__subclasses__():
+				impls = impls + list(subclass.plugins.values())
+			for impl in impls:
 				if hasattr(impl, method_name):
 					yield getattr(impl, method_name)
 		return wrapper
@@ -75,7 +87,10 @@ class MetaInterface(type):
 	@staticmethod
 	def meta_property_first(method_name):
 		def wrapper(cls):
-			for impl in cls.plugins.values():
+			impls = list(cls.plugins.values())
+			for subclass in cls.__subclasses__():
+				impls = impls + list(subclass.plugins.values())
+			for impl in impls:
 				if hasattr(impl, method_name):
 					return getattr(impl, method_name)
 		return wrapper

@@ -2,9 +2,9 @@ from sys import path
 path.append("/home/stanislavfeldman/projects/python/putils/")
 path.append("/home/stanislavfeldman/projects/python/pyplug/")
 import os
-from pyplug import PluginLoader
-from interface import MyInterface
-from putils.dynamics import Importer
+from pyplug import PluginLoader, Interface
+from interface import MyInterface, MyBaseInterface
+from putils.dynamics import Importer, Introspector
 		
 		
 if __name__ == "__main__":
@@ -17,7 +17,10 @@ if __name__ == "__main__":
 	MyInterface.do_smth_call_all()
 	print MyInterface.get_smth()
 	print MyInterface.prop()
-	for res in MyInterface.attr_get_all():
+	for res in MyBaseInterface.attr_get_all():
+		print res
+	for res in MyBaseInterface.name_get_all():
 		print res
 	#print MyInterface.attr()
 	print MyInterface.plugins["Plugin2"].get_smth()
+	print MyBaseInterface.__subclasses__()
