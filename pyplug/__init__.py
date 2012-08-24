@@ -12,7 +12,7 @@ class MetaPlugin(type):
 		new_obj = new_class()
 		if "implements" in attrs:
 			for iface in attrs["implements"]:
-				iface._plugins[new_obj.__class__.__name__] = new_obj
+				iface._plugins.append(new_obj)
 		return new_class
 	
 	
@@ -27,9 +27,8 @@ class Plugin(object):
 class MetaInterface(type):
 	def __new__(metaclass, classname, bases, attrs):
 		new_class = super(MetaInterface, metaclass).__new__(metaclass, classname, bases, attrs)
-		new_class._plugins = {}
+		new_class._plugins = []
 		new_class.plugins = classmethod(MetaInterface.plugins)
-		new_class.implementations = classmethod(MetaInterface.implementations)
 		new_class.plugin = classmethod(MetaInterface.plugin)
 		for k, v in attrs.iteritems():
 			if type(v) is FunctionType:
@@ -43,33 +42,32 @@ class MetaInterface(type):
 		
 	@staticmethod
 	def plugins(cls):
-		results = {}
-		for pl_name, pl_code in cls._plugins.iteritems():
-			results[pl_name] = pl_code
+		results = set()
+		for pl in cls._plugins:
+			results.add(pl)
 		for subclass in Introspector.all_subclasses(cls):
-			for name, code in subclass._plugins.iteritems():
-				if name not in results:
-					results[name] = code
-		return results
-	
-	@staticmethod	
-	def implementations(cls):
-		return list(cls.plugins().values())
+			for spl in subclass._plugins:
+				results.add(spl)
+		return list(results)
 		
 	@staticmethod
-	def plugin(cls, name, ignorecase=False):
-		if not ignorecase:
-			return cls.plugins()[name]
-		else:
-			for pl_name, pl_code in cls.plugins().iteritems():
-				if name.lower() == pl_name.lower():
-					return pl_code
-		raise KeyError("Dict has no key %s" % name)
+	def plugin(cls, name, fullname=True, ignorecase=False):
+		"""
+		Find plugin by class name
+		"""
+		for pl in cls.plugins():
+			pl_name = Introspector.classname(pl, full=fullname)
+			if ignorecase:
+				name = name.lower()
+				pl_name = pl_name.lower()
+			if name == pl_name:
+				return pl
+		raise IndexError("There is no plugin with name %s" % name)
 	
 	@staticmethod
 	def meta_method_get_all(method_name):
 		def wrapper(cls, *args, **kwargs):
-			for impl in cls.implementations():
+			for impl in cls.plugins():
 				if hasattr(impl, method_name):
 					method = getattr(impl, method_name)
 					yield method(*args, **kwargs)
@@ -78,7 +76,7 @@ class MetaInterface(type):
 	@staticmethod
 	def meta_method_call_all(method_name):
 		def wrapper(cls, *args, **kwargs):
-			for impl in cls.implementations():
+			for impl in cls.plugins():
 				if hasattr(impl, method_name):
 					method = getattr(impl, method_name)
 					method(*args, **kwargs)
@@ -87,7 +85,7 @@ class MetaInterface(type):
 	@staticmethod
 	def meta_method_call_first(method_name):
 		def wrapper(cls, *args, **kwargs):
-			for impl in cls.implementations():
+			for impl in cls.plugins():
 				if hasattr(impl, method_name):
 					method = getattr(impl, method_name)
 					return method(*args, **kwargs)
@@ -96,7 +94,7 @@ class MetaInterface(type):
 	@staticmethod
 	def meta_property_all(method_name):
 		def wrapper(cls):
-			for impl in cls.implementations():
+			for impl in cls.plugins():
 				if hasattr(impl, method_name):
 					yield getattr(impl, method_name)
 		return wrapper
@@ -104,7 +102,7 @@ class MetaInterface(type):
 	@staticmethod
 	def meta_property_first(method_name):
 		def wrapper(cls):
-			for impl in cls.implementations():
+			for impl in cls.plugins():
 				if hasattr(impl, method_name):
 					return getattr(impl, method_name)
 		return wrapper
