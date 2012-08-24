@@ -30,6 +30,7 @@ class MetaInterface(type):
 		new_class._plugins = {}
 		new_class.plugins = classmethod(MetaInterface.plugins)
 		new_class.implementations = classmethod(MetaInterface.implementations)
+		new_class.plugin = classmethod(MetaInterface.plugin)
 		for k, v in attrs.iteritems():
 			if type(v) is FunctionType:
 				setattr(new_class, k+"_get_all", classmethod(MetaInterface.meta_method_get_all(k)))
@@ -54,6 +55,16 @@ class MetaInterface(type):
 	@staticmethod	
 	def implementations(cls):
 		return list(cls.plugins().values())
+		
+	@staticmethod
+	def plugin(cls, name, ignorecase=False):
+		if not ignorecase:
+			return cls.plugins()[name]
+		else:
+			for pl_name, pl_code in cls.plugins().iteritems():
+				if name.lower() == pl_name.lower():
+					return pl_code
+		raise KeyError("Dict has no key %s" % name)
 	
 	@staticmethod
 	def meta_method_get_all(method_name):
