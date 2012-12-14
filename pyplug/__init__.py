@@ -30,6 +30,7 @@ class MetaInterface(type):
 		new_class._plugins = []
 		new_class.plugins = classmethod(MetaInterface.plugins)
 		new_class.plugin = classmethod(MetaInterface.plugin)
+		new_class.plugins_and_names = classmethod(MetaInterface.plugins_and_names)
 		for k, v in attrs.iteritems():
 			if type(v) is FunctionType:
 				setattr(new_class, k+"_get_all", classmethod(MetaInterface.meta_method_get_all(k)))
@@ -63,6 +64,24 @@ class MetaInterface(type):
 			if name == pl_name:
 				return pl
 		raise IndexError("There is no plugin with name %s" % name)
+
+	@staticmethod
+	def plugins_and_names(cls, fullname=True, ignorecase=False):
+		results = set()
+		for pl in cls._plugins:
+			pl_name = Introspector.classname(pl, full=fullname)
+			if ignorecase:
+				name = name.lower()
+				pl_name = pl_name.lower()
+			results.add((pl_name, pl))
+		for subclass in Introspector.all_subclasses(cls):
+			for spl in subclass._plugins:
+				spl_name = Introspector.classname(spl, full=fullname)
+				if ignorecase:
+					name = name.lower()
+					spl_name = spl_name.lower()
+				results.add((spl_name, spl))
+		return list(results)
 	
 	@staticmethod
 	def meta_method_get_all(method_name):

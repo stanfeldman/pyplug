@@ -1,6 +1,6 @@
 from sys import path
-path.append("/home/stanislavfeldman/projects/python/putils/")
-path.append("/home/stanislavfeldman/projects/python/pyplug/")
+path.append("../putils/")
+path.append("../pyplug/")
 import os
 from pyplug import PluginLoader, Interface
 from interface import MyInterface, MyBaseInterface
@@ -23,4 +23,4 @@ if __name__ == "__main__":
 	for res in MyBaseInterface.name_get_all():
 		print res
 	#print MyInterface.attr()
-	print MyInterface.plugins["Plugin2"].get_smth()
+	print MyInterface.plugin("Plugin2", fullname=False).get_smth()
