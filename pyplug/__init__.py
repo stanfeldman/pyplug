@@ -23,6 +23,11 @@ class Plugin(object):
 	"""
 	__metaclass__ = MetaPlugin
 
+	def call(self, method_name, *args, **kwargs):
+		if hasattr(self, method_name):
+			method = getattr(self, method_name)
+			return method(*args, **kwargs)
+
 
 class MetaInterface(type):
 	def __new__(metaclass, classname, bases, attrs):
@@ -71,14 +76,12 @@ class MetaInterface(type):
 		for pl in cls._plugins:
 			pl_name = Introspector.classname(pl, full=fullname)
 			if ignorecase:
-				name = name.lower()
 				pl_name = pl_name.lower()
 			results.add((pl_name, pl))
 		for subclass in Introspector.all_subclasses(cls):
 			for spl in subclass._plugins:
 				spl_name = Introspector.classname(spl, full=fullname)
 				if ignorecase:
-					name = name.lower()
 					spl_name = spl_name.lower()
 				results.add((spl_name, spl))
 		return list(results)
@@ -130,7 +133,7 @@ class MetaInterface(type):
 class Interface(object):
 	"""
 	Derive from this class to create plugin interface.
-	Then you can call all plugins or get some by name.
+	Then you can call all plugins or get one by name.
 	"""
 	__metaclass__ = MetaInterface
 	

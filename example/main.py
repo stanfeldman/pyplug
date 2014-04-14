@@ -24,3 +24,5 @@ if __name__ == "__main__":
 		print res
 	#print MyInterface.attr()
 	print MyInterface.plugin("Plugin2", fullname=False).get_smth()
+	print MyInterface.plugins_and_names(fullname=False, ignorecase=True)
+	print MyInterface.plugin("plugin2", fullname=False, ignorecase=True).call("get_smth")
